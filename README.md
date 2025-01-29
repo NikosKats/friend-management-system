@@ -59,6 +59,7 @@ This will start the **frontend, backend, and MongoDB**.
 ### **3️⃣ Access the Application**
 - **Frontend:** [http://localhost:5173](http://localhost:5173)
 - **Backend API:** [http://localhost:8080](http://localhost:8080)
+- **Mongo Express:** [http://localhost:8081](http://localhost:8081)
 
 ---
 
