@@ -78,3 +78,16 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+// src/controllers/authController.ts
+
+export const logout = async (req: Request, res: Response): Promise<Response> => {
+  try {
+ 
+    // res.clearCookie('token');  // Clears the cookie if you use cookies 
+    
+    return res.status(200).json({ message: 'Successfully logged out' });
+  } catch (error) {
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};

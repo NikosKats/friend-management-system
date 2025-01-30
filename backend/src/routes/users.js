@@ -25,6 +25,7 @@ router.get("/", (req, res) => {
 router.get("/protected", authMiddleware_1.authMiddleware, (req, res) => {
     res.send("protected route is visible...");
 });
+router.post('/logout', authController_1.logout);
 router.post('/login', authController_1.login);
 router.post('/register', authController_1.register);
 // Get all users

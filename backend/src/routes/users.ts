@@ -3,7 +3,7 @@ import User from "../models/User";
 import { randomBytes, pbkdf2Sync } from "crypto";
 import { Types } from "mongoose";
 import { authMiddleware } from "../middleware/authMiddleware";  // Import the middleware
-import { login, register } from '../controllers/authController';
+import { logout, login, register } from '../controllers/authController';
 
 const router = Router();
 
@@ -16,6 +16,7 @@ router.get("/protected", authMiddleware, (req: Request, res: Response) => {
   res.send("protected route is visible...");
 });
 
+router.post('/logout', logout);
 router.post('/login', login);
 router.post('/register', register);
 
