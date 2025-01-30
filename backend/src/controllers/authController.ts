@@ -54,7 +54,8 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
 
   try {
     // Find user by email
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }); 
+    
     if (!user) {
       return res.status(400).json({ error: 'Invalid email or password' });
     }
@@ -65,12 +66,25 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
       return res.status(400).json({ error: 'Invalid email or password' });
     }
 
-    // Generate a JWT token
-    const payload = { userId: user._id }; // You can add more data if needed
-    const token = jwt.sign(payload, process.env.JWT_SECRET || 'yourSecretKey', { expiresIn: '1h' });
+    const userData = {
+      _id: user._id.toString(),
+      username: user.username,
+      email: user.email,
+      friends: user.friends.map((id) => id.toString()),
+      friendRequests: {
+        sent: user.friendRequests.sent.map((id) => id.toString()),
+        received: user.friendRequests.received.map((id) => id.toString()),
+      },
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
+
+    // Generate a JWT token 
+    const token = jwt.sign(userData, process.env.JWT_SECRET || 'yourSecretKey', { expiresIn: '1h' });
 
     // Send back the JWT token
     return res.status(200).json({
+      user: userData,
       message: 'Login successful',
       token,
     });

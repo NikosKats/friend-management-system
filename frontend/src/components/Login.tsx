@@ -27,6 +27,7 @@ const Login: React.FC = () => {
       });
 
       const data = await response.json();
+      console.log("🚀 ~ handleSubmit ~ data:", data.user)
 
 
       if (!response.ok) {
@@ -35,6 +36,9 @@ const Login: React.FC = () => {
 
       // Save token in local storage (or state management)
       localStorage.setItem('token', data.token);
+    
+      localStorage.setItem("user",  JSON.stringify(data.user)); // Store user 
+
       console.log('Login successful:', data.message);
       
       // Redirect user to a protected page (or handle accordingly)
@@ -45,6 +49,8 @@ const Login: React.FC = () => {
     } finally {
       setLoading(false);
     }
+      // console.log("🚀 ~ handleSubmit ~ data:", data)
+      // console.log("🚀 ~ handleSubmit ~ data:", data)
   };
 
   return (
