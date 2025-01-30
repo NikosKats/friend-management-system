@@ -1,0 +1,90 @@
+.
+├── README.md
+├── backend
+│   ├── Dockerfile
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── src
+│   │   ├── config
+│   │   │   ├── db.js
+│   │   │   └── db.ts
+│   │   ├── controllers
+│   │   │   ├── authController.js
+│   │   │   └── authController.ts
+│   │   ├── index.js
+│   │   ├── index.ts
+│   │   ├── middleware
+│   │   │   ├── authMiddleware.js
+│   │   │   └── authMiddleware.ts
+│   │   ├── models
+│   │   │   ├── FriendRequest.js
+│   │   │   ├── FriendRequest.ts
+│   │   │   ├── Notification.js
+│   │   │   ├── Notification.ts
+│   │   │   ├── User.js
+│   │   │   └── User.ts
+│   │   ├── routes
+│   │   │   ├── friendRequests.js
+│   │   │   ├── friendRequests.ts
+│   │   │   ├── friends.js
+│   │   │   ├── friends.ts
+│   │   │   ├── users.js
+│   │   │   └── users.ts
+│   │   └── sockets
+│   ├── tests
+│   └── tsconfig.json
+├── docker-compose.yml
+├── folder_structure.txt
+└── frontend
+    ├── Dockerfile
+    ├── README.md
+    ├── eslint.config.js
+    ├── index.html
+    ├── package-lock.json
+    ├── package.json
+    ├── public
+    │   └── vite.svg
+    ├── src
+    │   ├── App.css
+    │   ├── App.tsx
+    │   ├── actions
+    │   │   ├── authActions.ts
+    │   │   └── userActions.ts
+    │   ├── assets
+    │   │   └── react.svg
+    │   ├── components
+    │   │   ├── Counter.tsx
+    │   │   ├── FriendCard.tsx
+    │   │   ├── FriendRequestForm.tsx
+    │   │   ├── FriendRequestItem.tsx
+    │   │   ├── FriendsList.tsx
+    │   │   ├── Header.tsx
+    │   │   ├── Login.tsx
+    │   │   ├── Notification.tsx
+    │   │   ├── Sidebar.tsx
+    │   │   ├── Signup.tsx
+    │   │   └── TopBar.tsx
+    │   ├── main.tsx
+    │   ├── reducers
+    │   │   ├── authReducer.ts
+    │   │   ├── index.ts
+    │   │   └── userReducer.ts
+    │   ├── sagas
+    │   │   ├── authSaga.ts
+    │   │   ├── index.ts
+    │   │   └── userSaga.ts
+    │   ├── store
+    │   │   └── store.ts
+    │   ├── streams
+    │   │   ├── apiStream.ts
+    │   │   ├── index.ts
+    │   │   └── websocketStream.ts
+    │   ├── utils
+    │   │   └── api.ts
+    │   └── vite-env.d.ts
+    ├── tsconfig.app.json
+    ├── tsconfig.json
+    ├── tsconfig.node.json
+    └── vite.config.ts
+
+21 directories, 67 files

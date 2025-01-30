@@ -2,6 +2,8 @@ import { Router, Request, Response } from "express";
 import User from "../models/User";
 import { randomBytes, pbkdf2Sync } from "crypto";
 import { Types } from "mongoose";
+import { authMiddleware } from "../middleware/authMiddleware";  // Import the middleware
+import { login, register } from '../controllers/authController';
 
 const router = Router();
 
@@ -9,6 +11,14 @@ const router = Router();
 router.get("/", (req: Request, res: Response) => {
   res.send("User API is running...");
 });
+
+router.get("/protected", authMiddleware, (req: Request, res: Response) => {
+  res.send("protected route is visible...");
+});
+
+router.post('/login', login);
+router.post('/register', register);
+
 
 // Get all users
 router.get("/all", async (req: Request, res: Response) => {
@@ -36,38 +46,6 @@ router.get("/:userId", async (req: Request, res: Response) => {
     }
 
     return res.status(200).json(user);
-  } catch (error) {
-    return res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-/**
- * @route POST /users/create
- * @desc Create a new user
- */
-router.post("/create", async (req: Request, res: Response) => {
-  const { username, email, password } = req.body;
-
-  if (!username || !email || !password) {
-    return res.status(400).json({ error: "All fields are required" });
-  }
-
-  try {
-    // Check if username or email already exists
-    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
-    if (existingUser) {
-      return res.status(400).json({ error: "Username or email already exists" });
-    }
-
-    // Hash the password using crypto
-    const salt = randomBytes(16).toString('hex');
-    const hashedPassword = pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
-
-    // Create and save the user
-    const user = new User({ username, email, password: hashedPassword });
-    await user.save();
-
-    return res.status(201).json({ message: "User created successfully", userId: user._id });
   } catch (error) {
     return res.status(500).json({ error: "Internal server error" });
   }

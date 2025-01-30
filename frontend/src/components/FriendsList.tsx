@@ -19,7 +19,7 @@ const FriendsList: React.FC = () => {
 
       try {
         const apiUrl = 'http://localhost:8080/';
-        const userId = '679b40b96126c642247fce18'; // Replace with dynamic user ID if needed
+        const userId = '679b7b53f31d3947a8aeb8d9'; // Replace with dynamic user ID if needed
         const response = await fetch(`${apiUrl}friends/list/${userId}`);
         if (!response.ok) {
           throw new Error('Error fetching friends');

@@ -14,13 +14,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const User_1 = __importDefault(require("../models/User"));
-const crypto_1 = require("crypto");
 const mongoose_1 = require("mongoose");
+const authMiddleware_1 = require("../middleware/authMiddleware"); // Import the middleware
+const authController_1 = require("../controllers/authController");
 const router = (0, express_1.Router)();
 // Get a simple message indicating the User API is running
 router.get("/", (req, res) => {
     res.send("User API is running...");
 });
+router.get("/protected", authMiddleware_1.authMiddleware, (req, res) => {
+    res.send("protected route is visible...");
+});
+router.post('/login', authController_1.login);
+router.post('/register', authController_1.register);
 // Get all users
 router.get("/all", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -43,33 +49,6 @@ router.get("/:userId", (req, res) => __awaiter(void 0, void 0, void 0, function*
             return res.status(404).json({ error: "User not found" });
         }
         return res.status(200).json(user);
-    }
-    catch (error) {
-        return res.status(500).json({ error: "Internal server error" });
-    }
-}));
-/**
- * @route POST /users/create
- * @desc Create a new user
- */
-router.post("/create", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { username, email, password } = req.body;
-    if (!username || !email || !password) {
-        return res.status(400).json({ error: "All fields are required" });
-    }
-    try {
-        // Check if username or email already exists
-        const existingUser = yield User_1.default.findOne({ $or: [{ username }, { email }] });
-        if (existingUser) {
-            return res.status(400).json({ error: "Username or email already exists" });
-        }
-        // Hash the password using crypto
-        const salt = (0, crypto_1.randomBytes)(16).toString('hex');
-        const hashedPassword = (0, crypto_1.pbkdf2Sync)(password, salt, 1000, 64, 'sha512').toString('hex');
-        // Create and save the user
-        const user = new User_1.default({ username, email, password: hashedPassword });
-        yield user.save();
-        return res.status(201).json({ message: "User created successfully", userId: user._id });
     }
     catch (error) {
         return res.status(500).json({ error: "Internal server error" });
