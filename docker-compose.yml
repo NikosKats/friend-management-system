@@ -10,8 +10,9 @@ services:
     environment:
       - MONGO_URI=mongodb://admin:securepassword@mongo:27017/friendsdb?authSource=admin
     volumes:
-      - ./backend:/app
-      - /app/node_modules
+      - ./backend:/app  # Mounting the backend code
+      - /app/node_modules  # Mount node_modules to avoid reinstalling packages
+    command: ["npm", "run", "dev"]  # Ensure 'dev' script runs nodemon for live reload
 
   frontend:
     build: ./frontend
@@ -23,8 +24,8 @@ services:
       - ./frontend:/app
       - /app/node_modules
     environment:
-      - CHOKIDAR_USEPOLLING=true
-    command: ["npm", "run", "dev", "--", "--host"]
+      - CHOKIDAR_USEPOLLING=true  # Enabling file polling for Vite
+    command: ["npm", "run", "dev", "--", "--host"]  # Ensure Vite runs correctly
 
   mongo:
     image: mongo
