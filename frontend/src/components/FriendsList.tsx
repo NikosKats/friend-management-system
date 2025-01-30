@@ -7,14 +7,20 @@ interface Friend {
   email: string;
 }
 
+
+
 const FriendsList: React.FC = () => {
   const [friends, setFriends] = useState<Friend[]>([]);
 
   useEffect(() => {
     // Fetch the friends list when the component mounts
     const fetchFriends = async () => {
+
+
       try {
-        const response = await fetch('/api/friends/list/123');  
+        const apiUrl = 'http://localhost:8080/';
+        const userId = '679b40b96126c642247fce18'; // Replace with dynamic user ID if needed
+        const response = await fetch(`${apiUrl}friends/list/${userId}`);
         if (!response.ok) {
           throw new Error('Error fetching friends');
         }

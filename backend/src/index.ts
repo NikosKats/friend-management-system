@@ -4,6 +4,7 @@ import connectDB from "./config/db";
 import userRoutes from "./routes/users";
 import friendRoutes from "./routes/friends";
 import friendRequests from "./routes/friendRequests";
+import cors from "cors";
 
 dotenv.config();
 connectDB(); // Connect to MongoDB
@@ -12,6 +13,11 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 app.use(express.json());
+
+// Allow requests from the frontend app on localhost:5173
+app.use(cors({
+  origin: 'http://localhost:5173',  
+}));
 
 // Routes
 app.use("/users", userRoutes);

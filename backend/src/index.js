@@ -9,11 +9,16 @@ const db_1 = __importDefault(require("./config/db"));
 const users_1 = __importDefault(require("./routes/users"));
 const friends_1 = __importDefault(require("./routes/friends"));
 const friendRequests_1 = __importDefault(require("./routes/friendRequests"));
+const cors_1 = __importDefault(require("cors"));
 dotenv_1.default.config();
 (0, db_1.default)(); // Connect to MongoDB
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 8080;
 app.use(express_1.default.json());
+// Allow requests from the frontend app on localhost:5173
+app.use((0, cors_1.default)({
+    origin: 'http://localhost:5173',
+}));
 // Routes
 app.use("/users", users_1.default);
 app.use("/friends", friends_1.default);
