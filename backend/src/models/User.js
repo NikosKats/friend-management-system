@@ -7,8 +7,8 @@ const userSchema = new mongoose_1.Schema({
     password: { type: String, required: true }, // Store hashed password
     friends: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "User" }],
     friendRequests: {
-        sent: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "User" }],
-        received: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "User" }]
+        sent: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "FriendRequest" }], // Reference FriendRequest
+        received: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "FriendRequest" }] // Reference FriendRequest
     }
 }, { timestamps: true });
 exports.default = (0, mongoose_1.model)("User", userSchema);

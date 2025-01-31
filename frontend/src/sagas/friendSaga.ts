@@ -20,11 +20,16 @@ function* sendFriendRequestSaga(action: any) {
     const response = yield call(sendFriendRequestApi, senderId, receiverId);
     console.log("🚀 ~ function*sendFriendRequestSaga ~ response:", response);
 
-    // Check if the message indicates success
-    if (response && response.message && response.message === 'Friend request sent successfully') {
+    // Check for success
+    if (response && response.message === 'Friend request sent successfully') {
       console.log("✅ [SAGA] Friend request sent successfully:", response.message);
       yield put({ type: SEND_FRIEND_REQUEST_SUCCESS, payload: response.message });
+    } else if (response && response.error === 'Friend request already sent') {
+      // Handle case where the friend request has already been sent
+      console.error("⚠️ [SAGA] Friend request already sent:", response.error);
+      yield put({ type: SEND_FRIEND_REQUEST_FAILURE, payload: response.error });
     } else {
+      // Handle any other failure response
       console.error("❌ [SAGA] Friend request failed:", response.message);
       yield put({ type: SEND_FRIEND_REQUEST_FAILURE, payload: response.message });
     }
@@ -33,6 +38,7 @@ function* sendFriendRequestSaga(action: any) {
     yield put({ type: SEND_FRIEND_REQUEST_FAILURE, payload: error.message });
   }
 }
+
 
 
 // Worker Saga: Respond to Friend Request

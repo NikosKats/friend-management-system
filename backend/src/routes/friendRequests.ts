@@ -39,8 +39,18 @@ router.post("/send", async (req, res) => {
     const friendRequest = new FriendRequest({ senderId, receiverId });
     await friendRequest.save();
 
+    // Add FriendRequest ID to sender's and receiver's friendRequests
+    await User.findByIdAndUpdate(senderId, {
+      $push: { "friendRequests.sent": friendRequest._id }
+    });
+
+    await User.findByIdAndUpdate(receiverId, {
+      $push: { "friendRequests.received": friendRequest._id }
+    });
+
     return res.status(201).json({ message: "Friend request sent successfully" });
   } catch (error) {
+    console.error("❌ Error while sending friend request:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 });
