@@ -75,4 +75,20 @@ router.delete("/delete/:userId", (req, res) => __awaiter(void 0, void 0, void 0,
         return res.status(500).json({ error: "Internal server error" });
     }
 }));
+/**
+ * @route DELETE /users/delete-all
+ * @desc Delete all users
+ */
+router.delete("/delete-all", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const result = yield User_1.default.deleteMany({}); // Deletes all users
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ error: "No users found" });
+        }
+        return res.status(200).json({ message: "All users deleted successfully" });
+    }
+    catch (error) {
+        return res.status(500).json({ error: "Internal server error" });
+    }
+}));
 exports.default = router;

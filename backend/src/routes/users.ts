@@ -76,4 +76,23 @@ router.delete("/delete/:userId", async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * @route DELETE /users/delete-all
+ * @desc Delete all users
+ */
+router.delete("/delete-all", async (req: Request, res: Response) => {
+  try {
+    const result = await User.deleteMany({}); // Deletes all users
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: "No users found" });
+    }
+
+    return res.status(200).json({ message: "All users deleted successfully" });
+  } catch (error) {
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
 export default router;
