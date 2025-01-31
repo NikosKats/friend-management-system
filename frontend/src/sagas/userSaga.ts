@@ -1,18 +1,24 @@
 import { call, put, takeEvery } from 'redux-saga/effects';
-import { setUser } from '../reducers/userReducer';
-import { FETCH_USER_REQUEST } from '../actions/userActions';
+import { fetchUsersSuccess, fetchUsersFailure, FETCH_USERS_REQUEST } from '../actions/userActions';
+import { fetchUsersApi } from '../api/userApi';   
 
-function* handleFetchUser(action: any) {
+// Worker saga to handle fetching users
+function* handleFetchUsers() {
   try {
-    const user = yield call(fetchUserApi, action.payload); // Replace `fetchUserApi` with your API call
-    yield put(setUser(user)); // Dispatch set user data
-  } catch (error) {
-    // Handle user fetch failure
+    console.log("⚙️ [SAGA] Running handleFetchUsers saga...");
+    const users = yield call(fetchUsersApi); // Call the API function
+    console.log("✅ [SAGA] Users fetched successfully:", users);
+    yield put(fetchUsersSuccess(users)); // Dispatch success with fetched users
+  } catch (error: any) {
+    console.error("❌ [SAGA] Error fetching users:", error.message);
+    yield put(fetchUsersFailure(error.message || 'Something went wrong')); // Dispatch failure with error message
   }
 }
 
+// Watcher saga to listen for FETCH_USERS_REQUEST action
 function* watchUserSaga() {
-  yield takeEvery(FETCH_USER_REQUEST, handleFetchUser);
+  console.log("👀 [SAGA] Watching for FETCH_USERS_REQUEST...");
+  yield takeEvery(FETCH_USERS_REQUEST, handleFetchUsers);
 }
 
 export { watchUserSaga };

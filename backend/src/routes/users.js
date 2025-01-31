@@ -29,7 +29,7 @@ router.post('/logout', authController_1.logout);
 router.post('/login', authController_1.login);
 router.post('/register', authController_1.register);
 // Get all users
-router.get("/all", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/all", authMiddleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const users = yield User_1.default.find(); // Fetch all users from the database
         return res.status(200).json(users); // Return the users
