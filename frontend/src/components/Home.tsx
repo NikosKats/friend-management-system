@@ -1,4 +1,6 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store'; // Adjust this based on your Redux setup
 import FriendsList from './FriendsList';
 import FriendRequestForm from './FriendRequestForm';
 import FriendRequestItem from './FriendRequestItem';
@@ -6,8 +8,47 @@ import Notification from './Notification';
 import Counter from './Counter';
 
 const Home: React.FC = () => {
-  const { _id, username, email, friends, friendRequests, createdAt, updatedAt } = JSON.parse(localStorage.getItem("user") || "{}");
+  // Access user info from Redux store
+  const payload = useSelector((state: any) => state.auth.user);  // Assuming user is stored in auth slice
+   
+  
+  console.log("🚀 ~ payload:", payload)
+   
+   
+ 
+  const user = payload.user;
+  console.log("🚀 ~ user:", user)
+  const token = payload.token;
+  console.log("🚀 ~ token:", token)
 
+  const {
+    _id,
+    username,
+    email,
+    friends = [],
+    friendRequests = { sent: [], received: [] },
+    createdAt,
+    updatedAt,
+  } = user || {}; // In case user is null or undefined
+  
+  // Destructure the friendRequests object
+  const { sent, received } = friendRequests;
+  
+  console.log("🚀 ~ id:", _id);
+  console.log("🚀 ~ username:", username);
+  console.log("🚀 ~ email:", email);
+  console.log("🚀 ~ friends:", friends);
+  console.log("🚀 ~ sent:", sent);
+  console.log("🚀 ~ received:", received);
+  console.log("🚀 ~ createdAt:", createdAt);
+  console.log("🚀 ~ updatedAt:", updatedAt);
+  
+  
+  if (!user) {
+    return <div>Loading...</div>; // Render loading if user is not available
+  }
+
+  
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4 pt-20">
       <h1 className="text-4xl font-semibold text-center text-blue-600 mb-6">

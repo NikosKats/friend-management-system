@@ -1,65 +1,70 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
-const API_URL = "http://localhost:8080/"; // Replace with your actual API URL
+import { loginRequest } from '../actions/authActions';
 
 const Login: React.FC = () => {
+
+  const navigate = useNavigate(); 
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  const { user: user, loading: authLoading, error: authError } = useSelector((state: any) => state.auth);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+  useEffect(() => {
+    console.log("authLoading:", authLoading);
+    console.log("authError:", authError);
+  }, [authLoading, authError]);
 
-    // Send login request to backend
-    try {
-      const response = await fetch(`${API_URL}users/login`, {  // Adjust URL if needed
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
-
-      const data = await response.json();
-      console.log("🚀 ~ handleSubmit ~ data:", data.user)
-
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Login failed');
+  useEffect(() => {
+    if (user) {
+      // Assuming your login response includes a token
+      const { token } = user;
+      if (token) {
+        localStorage.setItem('authToken', token); // Store token in localStorage
       }
-
-      // Save token in local storage (or state management)
-      localStorage.setItem('token', data.token);
-    
-      localStorage.setItem("user",  JSON.stringify(data.user)); // Store user 
-
-      console.log('Login successful:', data.message);
-      
-      // Redirect user to a protected page (or handle accordingly)
-      window.location.href = '/';  
-      
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+      navigate('/');  // Redirect to your dashboard or home page
     }
-      // console.log("🚀 ~ handleSubmit ~ data:", data)
-      // console.log("🚀 ~ handleSubmit ~ data:", data)
+  }, [user, navigate]);
+  
+  // Only set the error if there's a new one
+  useEffect(() => {
+    if (authError) {
+      setError(authError);
+    }
+  }, [authError]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Prevent submitting if already loading
+    if (authLoading) return;
+
+    setError(null); // Reset error on form submit
+    dispatch(loginRequest(email, password)); // Dispatch login request
   };
+
+  useEffect(() => {
+  if (user) {
+    // Assuming your login response includes a token
+    const { token } = user;
+    if (token) {
+      localStorage.setItem('authToken', token); // Store token in localStorage
+    }
+    navigate('/');  // Redirect to your dashboard or home page
+  }
+}, [user, navigate]);
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-sm">
         <h2 className="text-2xl font-semibold text-center text-blue-600 mb-6">Login</h2>
 
-        {/* Display error message if any */}
         {error && <div className="text-red-500 text-center mb-4">{error}</div>}
+        
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -84,17 +89,16 @@ const Login: React.FC = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
-
               required
             />
           </div>
 
           <button
             type="submit"
-            className={`w-full py-3 text-white font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${loading ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'}`}
-            disabled={loading}
+            className={`w-full py-3 text-white font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${authLoading ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'}`}
+            disabled={authLoading}
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {authLoading ? 'Logging in...' : 'Login'}
           </button>
         </form>
 

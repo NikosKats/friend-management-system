@@ -1,15 +1,19 @@
 // src/components/PrivateRoute.tsx
 import React from "react";
 import { Navigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../store"; // Adjust this import based on your store file location
 
 interface PrivateRouteProps {
   element: React.ReactElement;
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ element }) => {
-  const isAuthenticated = !!localStorage.getItem("token"); // Check if token exists
+  // Access user state from Redux store
+  const user = useSelector((state: RootState) => state.auth.user);
 
-  return isAuthenticated ? element : <Navigate to="/login" replace />;
+  // If user is not authenticated, redirect to login page
+  return user ? element : <Navigate to="/login" replace />;
 };
 
 export default PrivateRoute;
