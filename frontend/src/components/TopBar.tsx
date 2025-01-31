@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Use useNavigate instead of useHistory
+import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store'; // Adjust this import based on your store file location
 import { logoutUser } from '../actions/authActions'; // Assuming you have an action for logging out
 
 const TopBar: React.FC = () => {
-    const [searchQuery, setSearchQuery] = useState(''); // State for search query
-    const [showNotifications, setShowNotifications] = useState(false); // State for showing notifications dropdown
-    const navigate = useNavigate(); // Use navigate for route redirection
+    const [searchQuery, setSearchQuery] = useState('');
+    const [showNotifications, setShowNotifications] = useState(false);
+    const navigate = useNavigate();
 
     // Access the user authentication state from Redux store
     const user = useSelector((state: RootState) => state.auth.user);
@@ -28,6 +28,11 @@ const TopBar: React.FC = () => {
     // Toggle Notification Dropdown
     const toggleNotifications = () => {
         setShowNotifications((prevState) => !prevState);
+    };
+
+    // Handle profile redirection
+    const handleProfileClick = () => {
+        navigate('/profile'); // Redirect to profile page
     };
 
     return (
@@ -103,19 +108,28 @@ const TopBar: React.FC = () => {
             )}
 
             {/* Conditional rendering of Login/Signup or Logout */}
-            <div>
-                {!user ? (
+            <div className="flex items-center">
+                {user ? (
+                    <>
+                        {/* Avatar Icon */}
+                        <div 
+                            className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center cursor-pointer mr-4"
+                            onClick={handleProfileClick} // Navigate to profile
+                        >
+                            {user.username?.charAt(0).toUpperCase()} {/* Display first letter of username */}
+                        </div>
+                        <button
+                            onClick={handleLogout}
+                            className="hover:underline text-white"
+                        >
+                            Logout
+                        </button>
+                    </>
+                ) : (
                     <>
                         <a href="/login" className="mr-4 hover:underline">Login</a>
                         <a href="/signup" className="hover:underline">Signup</a>
                     </>
-                ) : (
-                    <button
-                        onClick={handleLogout}
-                        className="hover:underline text-white"
-                    >
-                        Logout
-                    </button>
                 )}
             </div>
         </div>
