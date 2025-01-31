@@ -4,12 +4,12 @@
 export const fetchUsersApi = async () => {
   console.log("🌐 [API] Fetching users..."); // Add this to track when the API function is called.
 
-  const token = localStorage.getItem("authToken");
+  const token = localStorage.getItem("token");
   console.log("🛑 [API] Token retrieved:", token); // Log the token being used for authentication
 
   const response = await fetch("http://localhost:8080/users/all", {
     headers: {
-      "x-auth-token": token ? `Bearer ${token}` : "",
+      "x-auth-token": token ? `${token}` : "",
     },
   });
 

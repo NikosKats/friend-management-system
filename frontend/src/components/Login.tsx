@@ -4,39 +4,28 @@ import { useNavigate } from 'react-router-dom';
 
 import { loginRequest } from '../actions/authActions';
 
+// Define state type for better type safety (Assuming you have a Redux state shape like this)
+interface AuthState {
+  user: { token: string } | null;
+  loading: boolean;
+  error: string | null;
+}
+
 const Login: React.FC = () => {
-
-  const navigate = useNavigate(); 
-
+  const navigate = useNavigate();
+  
+  // Component state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  // Redux state and dispatch
   const dispatch = useDispatch();
-  const { user: user, loading: authLoading, error: authError } = useSelector((state: any) => state.auth);
+  const { user, loading: authLoading, error: authError } = useSelector(
+    (state: { auth: AuthState }) => state.auth
+  );
 
-  useEffect(() => {
-    console.log("authLoading:", authLoading);
-    console.log("authError:", authError);
-  }, [authLoading, authError]);
-
-  useEffect(() => {
-    if (user) {
-      // Assuming your login response includes a token
-      const { token } = user;
-      if (token) {
-        localStorage.setItem('authToken', token); // Store token in localStorage
-      }
-      navigate('/');  // Redirect to your dashboard or home page
-    }
-  }, [user, navigate]);
-  
-  // Only set the error if there's a new one
-  useEffect(() => {
-    if (authError) {
-      setError(authError);
-    }
-  }, [authError]);
-
+  // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -47,16 +36,23 @@ const Login: React.FC = () => {
     dispatch(loginRequest(email, password)); // Dispatch login request
   };
 
+  // Side effects to handle user login and error updates
   useEffect(() => {
-  if (user) {
-    // Assuming your login response includes a token
-    const { token } = user;
-    if (token) {
-      localStorage.setItem('authToken', token); // Store token in localStorage
+    if (authError) {
+      setError(authError); // Set error when there's an auth error
     }
-    navigate('/');  // Redirect to your dashboard or home page
-  }
-}, [user, navigate]);
+  }, [authError]);
+
+  useEffect(() => {
+    if (user) {
+      // If user is logged in, save token and redirect to home
+      const { token } = user;
+      if (token) {
+        localStorage.setItem('authToken', token); // Store token in localStorage
+      }
+      navigate('/');  // Redirect to your dashboard or home page
+    }
+  }, [user, navigate]);
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
@@ -65,7 +61,6 @@ const Login: React.FC = () => {
 
         {error && <div className="text-red-500 text-center mb-4">{error}</div>}
         
-
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">Email</label>

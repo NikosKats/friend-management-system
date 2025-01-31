@@ -1,61 +1,37 @@
 import { call, put, takeLatest } from 'redux-saga/effects';
-import { 
-  LOGIN_REQUEST, 
-  LOGIN_SUCCESS, 
-  LOGIN_FAILURE, 
-  loginRequest, 
-  loginSuccess, 
-  loginFailure 
-} from '../actions/authActions';  
+import { LOGIN_REQUEST, loginSuccess, loginFailure, handleLoginSuccess } from '../actions/authActions';
+import { loginApi } from '../api/authApi';
 
-const API_URL = 'http://localhost:8080/'; // Adjust API URL if needed
-
-// Function to call the API for login
-const loginApi = async (email: string, password: string) => {
-  const response = await fetch(`${API_URL}users/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  });
-
-  if (!response.ok) {
-    throw new Error('Invalid credentials'); // Handle errors properly
-  }
-
-  return response.json();
-};
-
-// Worker Saga for Login Request
+// Worker Saga for Login
 function* handleLogin(action: any) {
+  console.log("⏳ Saga: handleLogin started. Action payload:", action.payload);
+
+  const { email, password } = action.payload;
 
   try {
-    const { email, password } = action.payload;
-
-    console.log('Saga: handleLogin started', action.payload);
-    console.log('Saga: Calling API with', email, password);
-
-    const data = yield call(loginApi, email, password);
-    console.log('Saga: API Response', data);
+    console.log("🔄 Saga: Calling login API with email:", email, "and password:", password);
+    const data = yield call(loginApi, email, password);  // API call to authenticate user
+    console.log("📡 Saga: API Response:", data);
 
     if (data.token && data.user) {
-      console.log('Saga: Dispatching LOGIN_SUCCESS');
-      yield put({ type: LOGIN_SUCCESS, payload: { user: data.user, token: data.token } });
+      console.log("✅ Saga: Login success, dispatching LOGIN_SUCCESS.");
+      
+      // Store token and user in localStorage, and dispatch success
+      yield put(handleLoginSuccess(data.token, data.user));
     } else {
-      console.log('Saga: Dispatching LOGIN_FAILURE');
-      yield put({ type: LOGIN_FAILURE, payload: data.message || 'Login failed' });
+      console.log("❌ Saga: Login failed, dispatching LOGIN_FAILURE.");
+      yield put(loginFailure(data.message || 'Login failed'));
     }
   } catch (error: any) {
-    console.error('Saga: Login error', error);
-    yield put({ type: LOGIN_FAILURE, payload: error.message || 'Login failed' });
+    console.error("⚠️ Saga: Login error", error);
+    yield put(loginFailure(error.message || 'Login failed'));
   }
 }
 
-
-// Watcher Saga
+// Watcher Saga for LOGIN_REQUEST
 function* watchLoginRequest() {
-  console.log('Saga: Watching for LOGIN_REQUEST');
+  console.log("👀 Watching for LOGIN_REQUEST action...");
   yield takeLatest(LOGIN_REQUEST, handleLogin);
 }
-
 
 export default watchLoginRequest;
