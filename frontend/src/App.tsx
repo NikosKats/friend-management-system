@@ -11,7 +11,7 @@ import PublicRoute from "./components/PublicRoute";
 import NotFound from "./components/NotFound";  
 import { loginSuccess } from "./actions/authActions";
 import * as jwt_decode from 'jwt-decode';
-import { SocketProvider, useSocket } from './contexts/SocketContext';  // Import the SocketContext
+import { SocketProvider } from './contexts/SocketContext';  // Import the SocketContext
 
 import "./app.css";
 

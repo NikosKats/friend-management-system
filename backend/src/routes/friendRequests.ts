@@ -133,4 +133,49 @@ router.get("/pending/:userId", async (req, res) => {
   }
 });
 
+ 
+/**
+ * @route DELETE /friend-requests/delete-all/:userId
+ * @desc Delete all pending friend requests for a user
+ */
+router.delete("/delete-all/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  if (!Types.ObjectId.isValid(userId)) {
+    return res.status(400).json({ error: "Invalid user ID" });
+  }
+
+  try {
+    // Find all pending friend requests where the user is either the sender or the receiver
+    const pendingRequests = await FriendRequest.find({
+      $or: [
+        { senderId: userId, status: "pending" },
+        { receiverId: userId, status: "pending" }
+      ]
+    });
+
+    // If no pending requests are found
+    if (pendingRequests.length === 0) {
+      return res.status(404).json({ error: "No pending friend requests found" });
+    }
+
+    // Delete the pending requests
+    await FriendRequest.deleteMany({
+      _id: { $in: pendingRequests.map((request) => request._id) }
+    });
+
+    // Also update the User model by removing the requests from the sent and received arrays
+    await Promise.all([
+      User.findByIdAndUpdate(userId, { $pull: { "friendRequests.sent": { $in: pendingRequests.map((req) => req._id) } } }),
+      User.findByIdAndUpdate(userId, { $pull: { "friendRequests.received": { $in: pendingRequests.map((req) => req._id) } } })
+    ]);
+
+    return res.status(200).json({ message: "All pending friend requests deleted" });
+  } catch (error) {
+    console.error("❌ Error while deleting all pending friend requests:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
 export default router;

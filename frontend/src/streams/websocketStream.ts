@@ -16,3 +16,9 @@ socket.on("friend-request-sent", (data) => {
   console.log("📩 Friend request successfully sent:", data);
   alert(`✅ ${data.message}`);
 });
+
+// Listen for friend request notification
+socket.on("friend-request-received", (data) => {
+    console.log("🔔 Friend request notification received:", data);
+    alert(`📨 ${data.message} from User ID: ${data.senderId}`);
+  });

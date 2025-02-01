@@ -39,17 +39,44 @@ app.use(
 
 // WebSocket connection handling
 io.on("connection", (socket) => {
-  console.log(`🟢 Client connected: ${socket.id}`);
+  console.log("🟢 New client connected:", socket.id);
 
-  socket.on("send-friend-request", (data) => {
-    console.log(`📩 Friend request event received:`, data);
+  // Store users in memory (optional: replace with Redis for scalability)
+  const users: Record<string, string> = {};
+
+  socket.on("register", (userId) => {
+    users[userId] = socket.id; // Map userId to socketId
+    console.log(`👤 User registered: ${userId} -> ${socket.id}`);
+  });
+
+  // Handle friend request
+  socket.on("send-friend-request", ({ senderId, receiverId }) => {
+    console.log(`📩 Friend request from ${senderId} to ${receiverId}`);
+
+    // Notify the sender (confirmation)
     socket.emit("friend-request-sent", { message: "Request Sent" });
+
+    // Notify the receiver (if online)
+    const receiverSocketId = users[receiverId];
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("friend-request-received", {
+        senderId,
+        message: "You have a new friend request!",
+      });
+      console.log(`🔔 Notification sent to ${receiverId}`);
+    }
   });
 
   socket.on("disconnect", () => {
-    console.log(`🔴 Client disconnected: ${socket.id}`);
+    console.log("🔴 Client disconnected:", socket.id);
+    for (const userId in users) {
+      if (users[userId] === socket.id) {
+        delete users[userId];
+      }
+    }
   });
 });
+
 
 // Routes
 app.use("/users", userRoutes);

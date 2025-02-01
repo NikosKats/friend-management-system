@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUsersRequest } from '../actions/usersActions';  
 import { sendFriendRequestRequest } from '../actions/friendActions';  
+import { socket } from "../streams/websocketStream";
 
 const UserGrid = () => {
   const dispatch = useDispatch();
@@ -12,6 +13,8 @@ const UserGrid = () => {
     const loading = useSelector((state: any) => state.users.loading);
     const error = useSelector((state: any) => state.users.error); 
   
+    const [notifications, setNotifications] = useState<{ senderId: string; message: string }[]>([]);
+
 
   useEffect(() => {
     console.log("📬 Dispatching FETCH_USERS_REQUEST action...");
@@ -25,6 +28,18 @@ const UserGrid = () => {
     console.log("📌 Redux State - Error:", error);
   }, [users, loading, error]);
 
+  useEffect(() => {
+    // Listen for incoming friend request notifications
+    socket.on("friend-request-received", (data) => {
+      console.log("🔔 Friend request notification:", data);
+      setNotifications((prev) => [...prev, data]);
+    });
+
+    return () => {
+      socket.off("friend-request-received");
+    };
+  }, []);
+
   // Function to handle sending friend request
   const handleSendFriendRequest = (senderId: string, receiverId: string) => {
     console.log(`📤 Sending friend request from user with ID: ${senderId} to user with ID: ${receiverId}`);
@@ -34,6 +49,17 @@ const UserGrid = () => {
   return (
     <div>
       <h1>Users</h1>
+
+           {/* Notification Section */}
+           {notifications.length > 0 && (
+        <div className="fixed top-4 right-4 bg-green-500 text-white p-4 rounded-lg shadow-lg">
+          {notifications.map((notif, index) => (
+            <div key={index} className="mb-2">
+              <strong>📨 Friend Request:</strong> {notif.message} (User ID: {notif.senderId})
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Display loading state */}
       {loading && <p>Loading users...</p>}
