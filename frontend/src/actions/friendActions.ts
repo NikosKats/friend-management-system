@@ -1,3 +1,5 @@
+import { socket } from "../streams/websocketStream";
+
 export const SEND_FRIEND_REQUEST_REQUEST = 'SEND_FRIEND_REQUEST_REQUEST';
 export const SEND_FRIEND_REQUEST_SUCCESS = 'SEND_FRIEND_REQUEST_SUCCESS';
 export const SEND_FRIEND_REQUEST_FAILURE = 'SEND_FRIEND_REQUEST_FAILURE';
@@ -7,11 +9,25 @@ export const RESPOND_FRIEND_REQUEST_SUCCESS = 'RESPOND_FRIEND_REQUEST_SUCCESS';
 export const RESPOND_FRIEND_REQUEST_FAILURE = 'RESPOND_FRIEND_REQUEST_FAILURE';
 
 // For sending a friend request
+// Friend request action creator
 export const sendFriendRequestRequest = (senderId: string, receiverId: string) => {
-  console.log(`📬 [ACTION] Dispatching SEND_FRIEND_REQUEST_REQUEST from sender: ${senderId} to receiver: ${receiverId}`);
-  return { 
-    type: SEND_FRIEND_REQUEST_REQUEST, 
-    payload: { senderId, receiverId } 
+  return (dispatch: any) => {
+    dispatch({ type: SEND_FRIEND_REQUEST_REQUEST });
+
+    try {
+      // Emit WebSocket event to send a friend request
+      socket.emit("send-friend-request", { senderId, receiverId });
+
+      dispatch({
+        type: SEND_FRIEND_REQUEST_SUCCESS,
+        payload: { senderId, receiverId },
+      });
+    } catch (error) {
+      dispatch({
+        type: SEND_FRIEND_REQUEST_FAILURE,
+        payload: error.message,
+      });
+    }
   };
 };
 

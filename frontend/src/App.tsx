@@ -11,6 +11,7 @@ import PublicRoute from "./components/PublicRoute";
 import NotFound from "./components/NotFound";  
 import { loginSuccess } from "./actions/authActions";
 import * as jwt_decode from 'jwt-decode';
+import { SocketProvider, useSocket } from './contexts/SocketContext';  // Import the SocketContext
 
 import "./app.css";
 
@@ -40,21 +41,23 @@ const App: React.FC = () => {
   };
 
   return (
-    <Router>
-      <TopBar />
-      <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4 pt-20">
-        <Routes>
-          {/* Use PublicRoute for login and signup pages */}
-          <Route path="/login" element={<PublicRoute element={<Login />} restricted={true} redirectPath="/" />} />
-          <Route path="/signup" element={<PublicRoute element={<Signup />} restricted={true} redirectPath="/" />} />
-          {/* PrivateRoute for the home page */}
-          <Route path="/" element={<PrivateRoute element={<Home />} />} />
-          <Route path="/profile" element={<PrivateRoute element={<Profile />} />} />
-          {/* Catch-all route for 404 page */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </div>
-    </Router>
+    <SocketProvider>  {/* Wrap your app with the SocketProvider */}
+      <Router>
+        <TopBar />
+        <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4 pt-20">
+          <Routes>
+            {/* Use PublicRoute for login and signup pages */}
+            <Route path="/login" element={<PublicRoute element={<Login />} restricted={true} redirectPath="/" />} />
+            <Route path="/signup" element={<PublicRoute element={<Signup />} restricted={true} redirectPath="/" />} />
+            {/* PrivateRoute for the home page */}
+            <Route path="/" element={<PrivateRoute element={<Home />} />} />
+            <Route path="/profile" element={<PrivateRoute element={<Profile />} />} />
+            {/* Catch-all route for 404 page */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </div>
+      </Router>
+    </SocketProvider>
   );
 };
 

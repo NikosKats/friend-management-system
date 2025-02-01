@@ -12,12 +12,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.setSocketIO = void 0;
 const express_1 = require("express");
 const FriendRequest_1 = __importDefault(require("../models/FriendRequest"));
 const User_1 = __importDefault(require("../models/User"));
 const mongoose_1 = require("mongoose");
 const router = (0, express_1.Router)();
-// Get a simple message indicating the Friend Requests API is running
+let io; // Declare io to use in the route
+// Assign io in the main server setup file
+const setSocketIO = (socketIO) => {
+    io = socketIO;
+};
+exports.setSocketIO = setSocketIO;
+// API status check
 router.get("/", (req, res) => {
     res.send("Friend Requests API is running...");
 });
@@ -34,34 +41,33 @@ router.post("/send", (req, res) => __awaiter(void 0, void 0, void 0, function* (
         return res.status(400).json({ error: "You cannot send a friend request to yourself" });
     }
     try {
-        // Check if the receiver exists
-        const receiver = yield User_1.default.findById(receiverId);
-        if (!receiver)
-            return res.status(404).json({ error: "User not found" });
-        // Check if the sender exists
-        const sender = yield User_1.default.findById(senderId);
-        if (!sender)
-            return res.status(404).json({ error: "Sender not found" });
-        // Check if a request already exists
+        const [sender, receiver] = yield Promise.all([
+            User_1.default.findById(senderId),
+            User_1.default.findById(receiverId)
+        ]);
+        if (!sender || !receiver) {
+            return res.status(404).json({ error: "Sender or receiver not found" });
+        }
         const existingRequest = yield FriendRequest_1.default.findOne({ senderId, receiverId, status: "pending" });
         if (existingRequest)
             return res.status(400).json({ error: "Friend request already sent" });
-        // Create the friend request with additional sender and receiver details
         const friendRequest = new FriendRequest_1.default({
             senderId,
-            senderUsername: sender.username, // Assuming sender has a username field
-            senderEmail: sender.email, // Assuming sender has an email field
+            senderUsername: sender.username,
+            senderEmail: sender.email,
             receiverId,
-            receiverUsername: receiver.username, // Assuming receiver has a username field
-            receiverEmail: receiver.email // Assuming receiver has an email field
+            receiverUsername: receiver.username,
+            receiverEmail: receiver.email
         });
         yield friendRequest.save();
-        // Add FriendRequest ID to sender's and receiver's friendRequests
-        yield User_1.default.findByIdAndUpdate(senderId, {
-            $push: { "friendRequests.sent": friendRequest._id }
-        });
-        yield User_1.default.findByIdAndUpdate(receiverId, {
-            $push: { "friendRequests.received": friendRequest._id }
+        yield Promise.all([
+            User_1.default.findByIdAndUpdate(senderId, { $push: { "friendRequests.sent": friendRequest._id } }),
+            User_1.default.findByIdAndUpdate(receiverId, { $push: { "friendRequests.received": friendRequest._id } })
+        ]);
+        io.emit("friend-request-sent", {
+            senderId,
+            receiverId,
+            message: `${sender.username} has sent you a friend request!`
         });
         return res.status(201).json({ message: "Friend request sent successfully" });
     }
@@ -76,25 +82,28 @@ router.post("/send", (req, res) => __awaiter(void 0, void 0, void 0, function* (
  */
 router.post("/respond", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { requestId, status } = req.body;
-    if (!mongoose_1.Types.ObjectId.isValid(requestId)) {
-        return res.status(400).json({ error: "Invalid request ID" });
-    }
-    if (!["accepted", "declined"].includes(status)) {
-        return res.status(400).json({ error: "Invalid status" });
+    if (!mongoose_1.Types.ObjectId.isValid(requestId) || !["accepted", "declined"].includes(status)) {
+        return res.status(400).json({ error: "Invalid request ID or status" });
     }
     try {
         const request = yield FriendRequest_1.default.findById(requestId);
-        if (!request)
-            return res.status(404).json({ error: "Friend request not found" });
-        if (request.status !== "pending") {
-            return res.status(400).json({ error: "Friend request already processed" });
+        if (!request || request.status !== "pending") {
+            return res.status(400).json({ error: "Invalid or already processed request" });
         }
         request.status = status;
         yield request.save();
         if (status === "accepted") {
-            yield User_1.default.findByIdAndUpdate(request.senderId, { $push: { friends: request.receiverId } });
-            yield User_1.default.findByIdAndUpdate(request.receiverId, { $push: { friends: request.senderId } });
+            yield Promise.all([
+                User_1.default.findByIdAndUpdate(request.senderId, { $push: { friends: request.receiverId } }),
+                User_1.default.findByIdAndUpdate(request.receiverId, { $push: { friends: request.senderId } })
+            ]);
         }
+        io.emit("friend-request-responded", {
+            senderId: request.senderId,
+            receiverId: request.receiverId,
+            status,
+            message: `Your friend request was ${status}`
+        });
         return res.status(200).json({ message: `Friend request ${status}` });
     }
     catch (error) {

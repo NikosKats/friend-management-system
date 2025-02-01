@@ -2,11 +2,17 @@ import { Router, Request, Response } from "express";
 import FriendRequest from "../models/FriendRequest";
 import User from "../models/User";
 import { Types } from "mongoose";
+import { Server } from "socket.io";
 
 const router = Router();
+let io: Server; // Declare io to use in the route
 
+// Assign io in the main server setup file
+export const setSocketIO = (socketIO: Server) => {
+  io = socketIO;
+};
 
-// Get a simple message indicating the Friend Requests API is running
+// API status check
 router.get("/", (req: Request, res: Response) => {
   res.send("Friend Requests API is running...");
 });
@@ -27,37 +33,38 @@ router.post("/send", async (req, res) => {
   }
 
   try {
-    // Check if the receiver exists
-    const receiver = await User.findById(receiverId);
-    if (!receiver) return res.status(404).json({ error: "User not found" });
+    const [sender, receiver] = await Promise.all([
+      User.findById(senderId),
+      User.findById(receiverId)
+    ]);
 
-    // Check if the sender exists
-    const sender = await User.findById(senderId);
-    if (!sender) return res.status(404).json({ error: "Sender not found" });
+    if (!sender || !receiver) {
+      return res.status(404).json({ error: "Sender or receiver not found" });
+    }
 
-    // Check if a request already exists
     const existingRequest = await FriendRequest.findOne({ senderId, receiverId, status: "pending" });
     if (existingRequest) return res.status(400).json({ error: "Friend request already sent" });
 
-    // Create the friend request with additional sender and receiver details
     const friendRequest = new FriendRequest({
       senderId,
-      senderUsername: sender.username, // Assuming sender has a username field
-      senderEmail: sender.email,       // Assuming sender has an email field
+      senderUsername: sender.username,
+      senderEmail: sender.email,
       receiverId,
-      receiverUsername: receiver.username, // Assuming receiver has a username field
-      receiverEmail: receiver.email      // Assuming receiver has an email field
+      receiverUsername: receiver.username,
+      receiverEmail: receiver.email
     });
 
     await friendRequest.save();
 
-    // Add FriendRequest ID to sender's and receiver's friendRequests
-    await User.findByIdAndUpdate(senderId, {
-      $push: { "friendRequests.sent": friendRequest._id }
-    });
+    await Promise.all([
+      User.findByIdAndUpdate(senderId, { $push: { "friendRequests.sent": friendRequest._id } }),
+      User.findByIdAndUpdate(receiverId, { $push: { "friendRequests.received": friendRequest._id } })
+    ]);
 
-    await User.findByIdAndUpdate(receiverId, {
-      $push: { "friendRequests.received": friendRequest._id }
+    io.emit("friend-request-sent", {
+      senderId,
+      receiverId,
+      message: `${sender.username} has sent you a friend request!`
     });
 
     return res.status(201).json({ message: "Friend request sent successfully" });
@@ -67,7 +74,6 @@ router.post("/send", async (req, res) => {
   }
 });
 
-
 /**
  * @route POST /friend-requests/respond
  * @desc Accept or decline a friend request
@@ -75,29 +81,32 @@ router.post("/send", async (req, res) => {
 router.post("/respond", async (req, res) => {
   const { requestId, status } = req.body;
 
-  if (!Types.ObjectId.isValid(requestId)) {
-    return res.status(400).json({ error: "Invalid request ID" });
-  }
-
-  if (!["accepted", "declined"].includes(status)) {
-    return res.status(400).json({ error: "Invalid status" });
+  if (!Types.ObjectId.isValid(requestId) || !["accepted", "declined"].includes(status)) {
+    return res.status(400).json({ error: "Invalid request ID or status" });
   }
 
   try {
     const request = await FriendRequest.findById(requestId);
-    if (!request) return res.status(404).json({ error: "Friend request not found" });
-
-    if (request.status !== "pending") {
-      return res.status(400).json({ error: "Friend request already processed" });
+    if (!request || request.status !== "pending") {
+      return res.status(400).json({ error: "Invalid or already processed request" });
     }
 
     request.status = status;
     await request.save();
 
     if (status === "accepted") {
-      await User.findByIdAndUpdate(request.senderId, { $push: { friends: request.receiverId } });
-      await User.findByIdAndUpdate(request.receiverId, { $push: { friends: request.senderId } });
+      await Promise.all([
+        User.findByIdAndUpdate(request.senderId, { $push: { friends: request.receiverId } }),
+        User.findByIdAndUpdate(request.receiverId, { $push: { friends: request.senderId } })
+      ]);
     }
+
+    io.emit("friend-request-responded", {
+      senderId: request.senderId,
+      receiverId: request.receiverId,
+      status,
+      message: `Your friend request was ${status}`
+    });
 
     return res.status(200).json({ message: `Friend request ${status}` });
   } catch (error) {

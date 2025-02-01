@@ -2,8 +2,12 @@ import React from "react";
 import { useSelector } from "react-redux";
 import Counter from "./Counter";
 import UserGrid from "./UserGrid"; // Import the new UserGrid component
+import { useSocket } from "../contexts/SocketContext";
 
 const Home: React.FC = () => {
+
+  const socket = useSocket();
+  
   // Access user info from Redux store
   const payload = useSelector((state: any) => state.auth.user);
 
