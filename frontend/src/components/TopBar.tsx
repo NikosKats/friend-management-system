@@ -41,6 +41,12 @@ const TopBar: React.FC = () => {
         navigate('/my-friends'); // Redirect to My Friends page
     };
 
+
+    // Navigate to My Friends page
+    const handleFriendRequestsClick = () => {
+        navigate('/friend-requests'); // Redirect to My Friends page
+    };
+
     return (
         <div className="w-full bg-blue-600 text-white p-4 flex justify-between items-center fixed top-0 left-0 z-50">
             {/* Logo on the left */}
@@ -87,6 +93,16 @@ const TopBar: React.FC = () => {
                 </button>
             )}
 
+            {/* My Friends Link */}
+            {user && (
+                <button
+                    onClick={handleFriendRequestsClick}
+                    className="text-white hover:underline"
+                >
+                    Friend Requests
+                </button>
+            )}
+
             {/* Conditional rendering of Notification Bell if user is authenticated */}
             {user && (
                 <div className="relative mr-4">
@@ -128,7 +144,7 @@ const TopBar: React.FC = () => {
                 {user ? (
                     <>
                         {/* Avatar Icon */}
-                        <div 
+                        <div
                             className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center cursor-pointer mr-4"
                             onClick={handleProfileClick} // Navigate to profile
                         >

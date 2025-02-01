@@ -11,8 +11,11 @@ export const RESPOND_FRIEND_REQUEST_FAILURE = 'RESPOND_FRIEND_REQUEST_FAILURE';
 // For sending a friend request
 // Friend request action creator
 export const sendFriendRequestRequest = (senderId: string, receiverId: string) => {
+ console.log("🚀 ~ sendFriendRequestRequest ~ receiverId:", receiverId)
+ console.log("🚀 ~ sendFriendRequestRequest ~ senderId:", senderId)
+ 
   return (dispatch: any) => {
-    dispatch({ type: SEND_FRIEND_REQUEST_REQUEST });
+    dispatch({ type: SEND_FRIEND_REQUEST_REQUEST, payload: { senderId, receiverId } });
 
     try {
       // Emit WebSocket event to send a friend request
@@ -22,6 +25,7 @@ export const sendFriendRequestRequest = (senderId: string, receiverId: string) =
         type: SEND_FRIEND_REQUEST_SUCCESS,
         payload: { senderId, receiverId },
       });
+        console.log("🚀 ~ return ~ payload:", payload)
     } catch (error) {
       dispatch({
         type: SEND_FRIEND_REQUEST_FAILURE,

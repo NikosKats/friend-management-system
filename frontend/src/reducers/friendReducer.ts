@@ -1,6 +1,6 @@
-import { 
-  SEND_FRIEND_REQUEST_REQUEST, 
-  SEND_FRIEND_REQUEST_SUCCESS, 
+import {
+  SEND_FRIEND_REQUEST_REQUEST,
+  SEND_FRIEND_REQUEST_SUCCESS,
   SEND_FRIEND_REQUEST_FAILURE,
   RESPOND_FRIEND_REQUEST_REQUEST,
   RESPOND_FRIEND_REQUEST_SUCCESS,
@@ -16,7 +16,7 @@ const initialState = {
 const friendReducer = (state = initialState, action: any) => {
   console.log("🚀 [REDUCER] Current State:", state);  // Log current state
   console.log("📥 [REDUCER] Dispatched Action:", action);  // Log dispatched action
-  
+
   switch (action.type) {
     case SEND_FRIEND_REQUEST_REQUEST:
       console.log("⏳ [REDUCER] Handling SEND_FRIEND_REQUEST_REQUEST...");
@@ -36,11 +36,11 @@ const friendReducer = (state = initialState, action: any) => {
       };
 
     case SEND_FRIEND_REQUEST_FAILURE:
-      console.error("❌ [REDUCER] Handling SEND_FRIEND_REQUEST_FAILURE with error:", action.payload);
+      console.error("❌ [REDUCER] Handling SEND_FRIEND_REQUEST_FAILURE with error:", action.payload || "Unknown error");
       return {
         ...state,
         loading: false,
-        error: action.payload,
+        error: action.payload || "An error occurred while sending friend request.",
       };
 
     case RESPOND_FRIEND_REQUEST_REQUEST:
@@ -61,12 +61,13 @@ const friendReducer = (state = initialState, action: any) => {
       };
 
     case RESPOND_FRIEND_REQUEST_FAILURE:
-      console.error("❌ [REDUCER] Handling RESPOND_FRIEND_REQUEST_FAILURE with error:", action.payload);
+      console.error("❌ [REDUCER] Handling RESPOND_FRIEND_REQUEST_FAILURE with error:", action.payload || "Unknown error");
       return {
         ...state,
         loading: false,
-        error: action.payload,
+        error: action.payload || "An error occurred while responding to friend request.",
       };
+
 
     default:
       return state;

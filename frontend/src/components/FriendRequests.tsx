@@ -1,8 +1,8 @@
-// src/components/FriendRequests.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
-import { getFriendRequests, acceptFriendRequest, declineFriendRequest } from '../actions/friendActions'; // Assume these actions exist
+import { respondFriendRequestRequest } from '../actions/friendActions'; // Actions
+import { socket } from '../streams/websocketStream'; // WebSocket connection
 
 const FriendRequests: React.FC = () => {
     const dispatch = useDispatch();
@@ -10,15 +10,20 @@ const FriendRequests: React.FC = () => {
 
     useEffect(() => {
         // Fetch the friend's requests when the component is mounted
-        dispatch(getFriendRequests());
+        // You can dispatch an action to get requests here, assuming you have such an action
+        // Example: dispatch(getFriendRequests());
     }, [dispatch]);
 
-    const handleAccept = (requestId: string) => {
-        dispatch(acceptFriendRequest(requestId)); // Dispatch action to accept friend request
+    // Handle accepting a friend request
+    const handleAccept = (requestId: string, senderId: string) => {
+        dispatch(respondFriendRequestRequest(requestId, 'accepted')); // Respond with 'accepted'
+        socket.emit('respond-friend-request', { requestId, status: 'accepted', senderId });
     };
 
-    const handleDecline = (requestId: string) => {
-        dispatch(declineFriendRequest(requestId)); // Dispatch action to decline friend request
+    // Handle declining a friend request
+    const handleDecline = (requestId: string, senderId: string) => {
+        dispatch(respondFriendRequestRequest(requestId, 'declined')); // Respond with 'declined'
+        socket.emit('respond-friend-request', { requestId, status: 'declined', senderId });
     };
 
     return (
@@ -33,13 +38,13 @@ const FriendRequests: React.FC = () => {
                             </div>
                             <div className="space-x-4">
                                 <button
-                                    onClick={() => handleAccept(request._id)}
+                                    onClick={() => handleAccept(request._id, request.senderId)}
                                     className="bg-green-500 text-white p-2 rounded"
                                 >
                                     Accept
                                 </button>
                                 <button
-                                    onClick={() => handleDecline(request._id)}
+                                    onClick={() => handleDecline(request._id, request.senderId)}
                                     className="bg-red-500 text-white p-2 rounded"
                                 >
                                     Decline

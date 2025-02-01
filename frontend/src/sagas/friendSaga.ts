@@ -9,32 +9,27 @@ import {
   RESPOND_FRIEND_REQUEST_FAILURE,
 } from '../actions/friendActions';  // Ensure correct path
 
-// Worker Saga: Send Friend Request
 function* sendFriendRequestSaga(action: any) {
   try {
     console.log("📬 [SAGA] Sending friend request...");
+
+    if (!action.payload) {
+      throw new Error("Missing payload in SEND_FRIEND_REQUEST_REQUEST action");
+    }
+
     const { senderId, receiverId } = action.payload;
-    console.log("🚀 ~ function*sendFriendRequestSaga ~ senderId, receiverId:", senderId, receiverId);
+    console.log("🚀 ~ senderId, receiverId:", senderId, receiverId);
 
-    // Call API to send friend request
     const response = yield call(sendFriendRequestApi, senderId, receiverId);
-    console.log("🚀 ~ function*sendFriendRequestSaga ~ response:", response);
+    console.log("🚀 ~ response:", response);
 
-    // Check for success
-    if (response && response.message === 'Friend request sent successfully') {
-      console.log("✅ [SAGA] Friend request sent successfully:", response.message);
+    if (response?.message === 'Friend request sent successfully') {
       yield put({ type: SEND_FRIEND_REQUEST_SUCCESS, payload: response.message });
-    } else if (response && response.error === 'Friend request already sent') {
-      // Handle case where the friend request has already been sent
-      console.error("⚠️ [SAGA] Friend request already sent:", response.error);
-      yield put({ type: SEND_FRIEND_REQUEST_FAILURE, payload: response.error });
     } else {
-      // Handle any other failure response
-      console.error("❌ [SAGA] Friend request failed:", response.message);
-      yield put({ type: SEND_FRIEND_REQUEST_FAILURE, payload: response.message });
+      yield put({ type: SEND_FRIEND_REQUEST_FAILURE, payload: response.error || "Unknown error" });
     }
   } catch (error) {
-    console.error("❌ [SAGA] Error while sending friend request:", error);
+    console.error("❌ [SAGA] Error:", error.message);
     yield put({ type: SEND_FRIEND_REQUEST_FAILURE, payload: error.message });
   }
 }
