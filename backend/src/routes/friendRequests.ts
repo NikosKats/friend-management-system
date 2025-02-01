@@ -31,12 +31,24 @@ router.post("/send", async (req, res) => {
     const receiver = await User.findById(receiverId);
     if (!receiver) return res.status(404).json({ error: "User not found" });
 
+    // Check if the sender exists
+    const sender = await User.findById(senderId);
+    if (!sender) return res.status(404).json({ error: "Sender not found" });
+
     // Check if a request already exists
     const existingRequest = await FriendRequest.findOne({ senderId, receiverId, status: "pending" });
     if (existingRequest) return res.status(400).json({ error: "Friend request already sent" });
 
-    // Create and save the request
-    const friendRequest = new FriendRequest({ senderId, receiverId });
+    // Create the friend request with additional sender and receiver details
+    const friendRequest = new FriendRequest({
+      senderId,
+      senderUsername: sender.username, // Assuming sender has a username field
+      senderEmail: sender.email,       // Assuming sender has an email field
+      receiverId,
+      receiverUsername: receiver.username, // Assuming receiver has a username field
+      receiverEmail: receiver.email      // Assuming receiver has an email field
+    });
+
     await friendRequest.save();
 
     // Add FriendRequest ID to sender's and receiver's friendRequests
@@ -54,6 +66,7 @@ router.post("/send", async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 /**
  * @route POST /friend-requests/respond

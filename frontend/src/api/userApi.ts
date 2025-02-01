@@ -2,33 +2,33 @@
 
 const API_URL = 'http://localhost:8080/'; // Adjust API URL if needed
 
-// API function to fetch users
-export const fetchUsersApi = async () => {
-  console.log("🌐 [API] Fetching users..."); // Add this to track when the API function is called.
+// API function to fetch a single user
+export const fetchUserApi = async (userId: string) => {
+  console.log(`🌐 [API] Fetching user with ID: ${userId}`);
 
   const token = localStorage.getItem("token");
-  console.log("🛑 [API] Token retrieved:", token); // Log the token being used for authentication
+  console.log("🛑 [API] Token retrieved:", token);
 
   try {
-    const response = await fetch(`${API_URL}users/all`, {
+    const response = await fetch(`${API_URL}users/${userId}`, {
       headers: {
         "x-auth-token": token ? `${token}` : "",
       },
     });
 
-    console.log("📡 [API] Response received:", response); // Log the response object
+    console.log("📡 [API] Response received:", response);
 
     const data = await response.json();
-    console.log("📡 [API] Parsed JSON:", data); // Log the parsed JSON data
+    console.log("📡 [API] Parsed JSON:", data);
 
     if (!response.ok) {
-      console.error("❌ [API] Fetch failed:", data.message); // Log any failure message from the API
-      throw new Error(data.message || "Failed to fetch users");
+      console.error("❌ [API] Fetch failed:", data.message);
+      throw new Error(data.message || "Failed to fetch user");
     }
 
     return data;
   } catch (error) {
-    console.error("🔥 [API] Error in fetching users:", error);
+    console.error("🔥 [API] Error in fetching user:", error);
     throw error;
   }
 };

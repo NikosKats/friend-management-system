@@ -1,38 +1,20 @@
-import {
-  FETCH_USERS_REQUEST,
-  FETCH_USERS_SUCCESS,
-  FETCH_USERS_FAILURE,
-} from '../actions/userActions';
+// reducers/userReducer.ts
+import { FETCH_USER_REQUEST, FETCH_USER_SUCCESS, FETCH_USER_FAILURE } from "../actions/userActions";
 
-type UserState = {
-  users: any[];
-  loading: boolean;
-  error: string | null;
-};
-
-const initialState: UserState = {
-  users: [],
+const initialState = {
+  user: null,
   loading: false,
   error: null,
 };
 
-export const userReducer = (state = initialState, action: any): UserState => {
-  console.log('🚀 [REDUCER] Current State:', state);  // Log current state
-  console.log('📥 [REDUCER] Dispatched Action:', action);  // Log dispatched action
-
+const userReducer = (state = initialState, action: any) => {
   switch (action.type) {
-    case FETCH_USERS_REQUEST:
-      console.log('⏳ [REDUCER] Handling FETCH_USERS_REQUEST...');
+    case FETCH_USER_REQUEST:
       return { ...state, loading: true };
-      
-    case FETCH_USERS_SUCCESS:
-      console.log('✅ [REDUCER] Handling FETCH_USERS_SUCCESS...');
-      return { ...state, loading: false, users: action.payload };
-      
-    case FETCH_USERS_FAILURE:
-      console.log('❌ [REDUCER] Handling FETCH_USERS_FAILURE...');
+    case FETCH_USER_SUCCESS:
+      return { ...state, loading: false, user: action.payload, error: null };
+    case FETCH_USER_FAILURE:
       return { ...state, loading: false, error: action.payload };
-      
     default:
       return state;
   }

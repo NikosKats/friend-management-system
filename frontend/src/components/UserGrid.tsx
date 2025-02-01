@@ -1,18 +1,29 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUsersRequest } from '../actions/userActions'; // Ensure correct path
-import { sendFriendRequestRequest } from '../actions/friendActions'; // Import the action
+import { fetchUsersRequest } from '../actions/usersActions';  
+import { sendFriendRequestRequest } from '../actions/friendActions';  
 
 const UserGrid = () => {
   const dispatch = useDispatch();
+
+  // Get users, loading, and error state from Redux 
+
+    const users = useSelector((state: any) => state.users.users);
+    const loading = useSelector((state: any) => state.users.loading);
+    const error = useSelector((state: any) => state.users.error); 
   
-  // Get users, loading, and error state from Redux
-  const { users, loading, error } = useSelector((state: any) => state.user);
 
   useEffect(() => {
     console.log("📬 Dispatching FETCH_USERS_REQUEST action...");
     dispatch(fetchUsersRequest()); // Dispatch action to start fetching users
   }, [dispatch]);
+
+  // Debugging logs for Redux state
+  useEffect(() => {
+    console.log("📌 Redux State - Users:", users);
+    console.log("📌 Redux State - Loading:", loading);
+    console.log("📌 Redux State - Error:", error);
+  }, [users, loading, error]);
 
   // Function to handle sending friend request
   const handleSendFriendRequest = (senderId: string, receiverId: string) => {
@@ -32,7 +43,7 @@ const UserGrid = () => {
 
       {/* Display users */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {users.length > 0 ? (
+        {Array.isArray(users) && users.length > 0 ? (
           users.map((user) => (
             <div key={user._id} className="bg-white p-4 rounded-lg shadow-md">
               <h2 className="text-xl font-semibold">{user.username}</h2>
@@ -41,13 +52,18 @@ const UserGrid = () => {
               {/* Friend Request Button */}
               <button
                 onClick={() => {
-                  const loggedInUser = JSON.parse(localStorage.getItem("user") || "{}"); // Get logged-in user from localStorage
-                  const senderId = loggedInUser?._id; // Extract senderId (_id) from logged-in user object
-                  const receiverId = user._id; // Extract receiverId (_id) from the current user in the map
-                  if (senderId && receiverId) {
-                    handleSendFriendRequest(senderId, receiverId); // Pass both senderId and receiverId
+                  const loggedInUser = localStorage.getItem("user");
+                  if (loggedInUser) {
+                    const senderId = JSON.parse(loggedInUser)?._id; // Get sender ID from logged-in user
+                    const receiverId = user._id; // Get receiver ID from the current user
+                    if (senderId && receiverId) {
+                      console.log(`📤 Sending friend request from ${senderId} to ${receiverId}`);
+                      handleSendFriendRequest(senderId, receiverId); // Send friend request
+                    } else {
+                      console.error("❌ [UI] Sender or Receiver ID is missing.");
+                    }
                   } else {
-                    console.error("❌ [UI] Sender or Receiver ID is missing.");
+                    console.error("❌ [UI] Logged-in user data not found.");
                   }
                 }}
                 className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"

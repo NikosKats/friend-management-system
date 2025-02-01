@@ -1,18 +1,20 @@
-export const FETCH_USERS_REQUEST = 'FETCH_USERS_REQUEST';
-export const FETCH_USERS_SUCCESS = 'FETCH_USERS_SUCCESS';
-export const FETCH_USERS_FAILURE = 'FETCH_USERS_FAILURE';
+// src/actions/userActions.ts
 
-export const fetchUsersRequest = () => {
-  console.log("🔥 [ACTION] Dispatching FETCH_USERS_REQUEST");
-  return { type: FETCH_USERS_REQUEST };
+export const FETCH_USER_REQUEST = "FETCH_USER_REQUEST";
+export const FETCH_USER_SUCCESS = "FETCH_USER_SUCCESS";
+export const FETCH_USER_FAILURE = "FETCH_USER_FAILURE";
+
+export const fetchUserRequest = (userId: string,) => {
+  console.log(`🔥 [ACTION] Dispatching FETCH_USER_REQUEST from ${userId}`);
+  return { type: FETCH_USER_REQUEST, payload: userId };
 };
 
-export const fetchUsersSuccess = (users: any[]) => {
-  console.log("✅ [ACTION] Dispatching FETCH_USERS_SUCCESS with users:", users);
-  return { type: FETCH_USERS_SUCCESS, payload: users };
+export const fetchUserSuccess = (user: any) => {
+  console.log("✅ [ACTION] Dispatching FETCH_USER_SUCCESS with user:", user);
+  return { type: FETCH_USER_SUCCESS, payload: user };
 };
 
-export const fetchUsersFailure = (error: string) => {
-  console.error("❌ [ACTION] Dispatching FETCH_USERS_FAILURE with error:", error);
-  return { type: FETCH_USERS_FAILURE, payload: error };
+export const fetchUserFailure = (error: string) => {
+  console.error("❌ [ACTION] Dispatching FETCH_USER_FAILURE with error:", error);
+  return { type: FETCH_USER_FAILURE, payload: error };
 };

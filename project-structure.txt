@@ -1,0 +1,107 @@
+.
+├── README.md
+├── backend
+│   ├── Dockerfile
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── src
+│   │   ├── config
+│   │   │   ├── db.js
+│   │   │   └── db.ts
+│   │   ├── controllers
+│   │   │   ├── authController.js
+│   │   │   └── authController.ts
+│   │   ├── index.js
+│   │   ├── index.ts
+│   │   ├── middleware
+│   │   │   ├── authMiddleware.js
+│   │   │   └── authMiddleware.ts
+│   │   ├── models
+│   │   │   ├── FriendRequest.js
+│   │   │   ├── FriendRequest.ts
+│   │   │   ├── Notification.js
+│   │   │   ├── Notification.ts
+│   │   │   ├── User.js
+│   │   │   └── User.ts
+│   │   ├── routes
+│   │   │   ├── friendRequests.js
+│   │   │   ├── friendRequests.ts
+│   │   │   ├── friends.js
+│   │   │   ├── friends.ts
+│   │   │   ├── users.js
+│   │   │   └── users.ts
+│   │   ├── sockets
+│   │   └── types
+│   │       └── jsonwebtoken.d.ts
+│   ├── tests
+│   └── tsconfig.json
+├── docker-compose.yml
+├── folder_structure.txt
+├── frontend
+│   ├── Dockerfile
+│   ├── README.md
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── public
+│   │   └── vite.svg
+│   ├── src
+│   │   ├── App.css
+│   │   ├── App.tsx
+│   │   ├── actions
+│   │   │   ├── authActions.ts
+│   │   │   ├── friendActions.ts
+│   │   │   ├── userActions.ts
+│   │   │   └── usersActions.ts
+│   │   ├── api
+│   │   │   ├── authApi.ts
+│   │   │   ├── friendApi.ts
+│   │   │   ├── userApi.ts
+│   │   │   └── usersApi.ts
+│   │   ├── assets
+│   │   │   └── react.svg
+│   │   ├── components
+│   │   │   ├── Counter.tsx
+│   │   │   ├── Header.tsx
+│   │   │   ├── Home.tsx
+│   │   │   ├── Login.tsx
+│   │   │   ├── Logout.tsx
+│   │   │   ├── NotFound.tsx
+│   │   │   ├── Notification.tsx
+│   │   │   ├── PrivateRoute.tsx
+│   │   │   ├── Profile.tsx
+│   │   │   ├── PublicRoute.tsx
+│   │   │   ├── Sidebar.tsx
+│   │   │   ├── Signup.tsx
+│   │   │   ├── TopBar.tsx
+│   │   │   └── UserGrid.tsx
+│   │   ├── main.tsx
+│   │   ├── reducers
+│   │   │   ├── authReducer.ts
+│   │   │   ├── friendReducer.ts
+│   │   │   ├── rootReducer.ts
+│   │   │   ├── userReducer.ts
+│   │   │   └── usersReducer.ts
+│   │   ├── sagas
+│   │   │   ├── authSaga.ts
+│   │   │   ├── friendSaga.ts
+│   │   │   ├── rootSaga.ts
+│   │   │   ├── userSaga.ts
+│   │   │   └── usersSaga.ts
+│   │   ├── store
+│   │   │   └── store.ts
+│   │   ├── streams
+│   │   │   ├── apiStream.ts
+│   │   │   ├── index.ts
+│   │   │   └── websocketStream.ts
+│   │   ├── utils
+│   │   │   └── api.ts
+│   │   └── vite-env.d.ts
+│   ├── tsconfig.app.json
+│   ├── tsconfig.json
+│   ├── tsconfig.node.json
+│   └── vite.config.ts
+└── project-structure.txt
+
+23 directories, 82 files

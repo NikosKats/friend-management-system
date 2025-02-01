@@ -11,6 +11,7 @@ const TopBar: React.FC = () => {
 
     // Access the user authentication state from Redux store
     const user = useSelector((state: RootState) => state.auth.user);
+    console.log("🚀 ~ !!!!!!!!!!!!!!! user:", user)
 
     const dispatch = useDispatch();
 

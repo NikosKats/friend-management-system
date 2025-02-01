@@ -1,19 +1,47 @@
-import React from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "../store"; // Adjust this import based on your store file location
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux"; 
+import { fetchUserRequest } from "../actions/userActions"; // Ensure this action is correctly implemented
 
 const Profile: React.FC = () => {
-  // Access the user data directly from the Redux store
-  const payload = useSelector((state: any) => state.auth.user);  // Assuming user is stored in auth slice
-  
-  const user = payload?.user;  
-  
-  // If user is not loaded yet (or not authenticated), you can show a loading state or message
+  const dispatch = useDispatch();
+
+  const payload = useSelector((state: any) => state.auth.user);
+
+  console.log("-------------->🚀 ~ payload:", payload)
+  const user = payload?.user;
+  console.log("------------->🚀 ~ user:", user)
+
+  // Fetch updated user data on component mount and periodically
+  useEffect(() => {
+    if (user?._id) {
+      dispatch(fetchUserRequest(user._id));
+
+      const interval = setInterval(() => {
+        dispatch(fetchUserRequest(user._id));
+      }, 5000);
+
+      return () => clearInterval(interval);
+    }
+  }, [dispatch, user?._id]);
+
   if (!user) {
     return <div>Loading...</div>;
   }
 
   const { username, email, _id, createdAt, updatedAt, friendRequests, friends } = user;
+
+  const renderFriendRequests = (requests: string[]) => {
+    if (requests.length === 0) {
+      return <p>No friend requests.</p>;
+    }
+    return (
+      <ul>
+        {requests.map((requestId) => (
+          <li key={requestId}>Request ID: {requestId}</li>
+        ))}
+      </ul>
+    );
+  };
 
   return (
     <div className="bg-white shadow-md rounded-lg p-4 mb-6 w-full max-w-md mt-6">
@@ -26,13 +54,16 @@ const Profile: React.FC = () => {
 
       <div className="mt-4">
         <h3 className="text-lg font-semibold">Friend Requests</h3>
-        <p><strong>Sent:</strong> {friendRequests.sent.length}</p>
-        <p><strong>Received:</strong> {friendRequests.received.length}</p>
+        <p><strong>Sent:</strong> {friendRequests?.sent.length || 0}</p>
+        {renderFriendRequests(friendRequests?.sent || [])}
+
+        <p><strong>Received:</strong> {friendRequests?.received.length || 0}</p>
+        {renderFriendRequests(friendRequests?.received || [])}
       </div>
 
       <div className="mt-4">
         <h3 className="text-lg font-semibold">Friends</h3>
-        <p>{friends.length} friends</p>
+        <p>{friends?.length || 0} friends</p>
       </div>
     </div>
   );
