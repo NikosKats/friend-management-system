@@ -12,8 +12,10 @@ import NotFound from "./components/NotFound";
 import { loginSuccess } from "./actions/authActions";
 import * as jwt_decode from 'jwt-decode';
 import { SocketProvider } from './contexts/SocketContext';  // Import the SocketContext
+import FriendRequests from './components/FriendRequests'; // Import the new FriendRequests component
 
 import "./app.css";
+import MyFriends from "./components/MyFriends";
 
 const App: React.FC = () => {
   const dispatch = useDispatch();
@@ -52,6 +54,9 @@ const App: React.FC = () => {
             {/* PrivateRoute for the home page */}
             <Route path="/" element={<PrivateRoute element={<Home />} />} />
             <Route path="/profile" element={<PrivateRoute element={<Profile />} />} />
+            <Route path="/my-friends" element={<PrivateRoute element={<MyFriends />} />} />
+            <Route path="/friend-requests" element={<PrivateRoute element={<FriendRequests />} />} />
+
             {/* Catch-all route for 404 page */}
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -36,6 +36,11 @@ const TopBar: React.FC = () => {
         navigate('/profile'); // Redirect to profile page
     };
 
+    // Navigate to My Friends page
+    const handleMyFriendsClick = () => {
+        navigate('/my-friends'); // Redirect to My Friends page
+    };
+
     return (
         <div className="w-full bg-blue-600 text-white p-4 flex justify-between items-center fixed top-0 left-0 z-50">
             {/* Logo on the left */}
@@ -70,6 +75,16 @@ const TopBar: React.FC = () => {
                         />
                     </svg>
                 </div>
+            )}
+
+            {/* My Friends Link */}
+            {user && (
+                <button
+                    onClick={handleMyFriendsClick}
+                    className="text-white hover:underline"
+                >
+                    My Friends
+                </button>
             )}
 
             {/* Conditional rendering of Notification Bell if user is authenticated */}
