@@ -36,7 +36,6 @@
 │   ├── tests
 │   └── tsconfig.json
 ├── docker-compose.yml
-├── folder_structure.txt
 ├── frontend
 │   ├── Dockerfile
 │   ├── README.md
@@ -52,21 +51,29 @@
 │   │   ├── actions
 │   │   │   ├── authActions.ts
 │   │   │   ├── friendActions.ts
+│   │   │   ├── friendRequestsReceivedActions.ts
+│   │   │   ├── friendRequestsSentActions.ts
+│   │   │   ├── myFriendsActions.ts
 │   │   │   ├── userActions.ts
 │   │   │   └── usersActions.ts
 │   │   ├── api
 │   │   │   ├── authApi.ts
 │   │   │   ├── friendApi.ts
+│   │   │   ├── friendRequestsReceivedApi.ts
+│   │   │   ├── friendRequestsSentApi.ts
+│   │   │   ├── myFriendsApi.ts
 │   │   │   ├── userApi.ts
 │   │   │   └── usersApi.ts
 │   │   ├── assets
 │   │   │   └── react.svg
 │   │   ├── components
 │   │   │   ├── Counter.tsx
+│   │   │   ├── FriendRequests.tsx
 │   │   │   ├── Header.tsx
 │   │   │   ├── Home.tsx
 │   │   │   ├── Login.tsx
 │   │   │   ├── Logout.tsx
+│   │   │   ├── MyFriends.tsx
 │   │   │   ├── NotFound.tsx
 │   │   │   ├── Notification.tsx
 │   │   │   ├── PrivateRoute.tsx
@@ -76,16 +83,24 @@
 │   │   │   ├── Signup.tsx
 │   │   │   ├── TopBar.tsx
 │   │   │   └── UserGrid.tsx
+│   │   ├── contexts
+│   │   │   └── SocketContext.tsx
 │   │   ├── main.tsx
 │   │   ├── reducers
 │   │   │   ├── authReducer.ts
 │   │   │   ├── friendReducer.ts
+│   │   │   ├── friendRequestsReceivedReducer.ts
+│   │   │   ├── friendRequestsSentReducer.ts
+│   │   │   ├── myFriendsReducer.ts
 │   │   │   ├── rootReducer.ts
 │   │   │   ├── userReducer.ts
 │   │   │   └── usersReducer.ts
 │   │   ├── sagas
 │   │   │   ├── authSaga.ts
+│   │   │   ├── friendRequestsReceivedSaga.ts
+│   │   │   ├── friendRequestsSentSaga.ts
 │   │   │   ├── friendSaga.ts
+│   │   │   ├── myFriendsSaga.ts
 │   │   │   ├── rootSaga.ts
 │   │   │   ├── userSaga.ts
 │   │   │   └── usersSaga.ts
@@ -104,4 +119,4 @@
 │   └── vite.config.ts
 └── project-structure.txt
 
-23 directories, 82 files
+24 directories, 96 files
