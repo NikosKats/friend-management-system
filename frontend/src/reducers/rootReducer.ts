@@ -4,6 +4,8 @@ import userReducer from './userReducer';
 import usersReducer from './usersReducer';
 import friendReducer from './friendReducer';  
 import myFriendsReducer from './myFriendsReducer';  
+import friendRequestsReceivedReducer from './friendRequestsReceivedReducer';
+import friendRequestsSentReducer from './friendRequestsSentReducer';
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -11,6 +13,8 @@ const rootReducer = combineReducers({
   users: usersReducer,
   friend: friendReducer,   
   myFriend: myFriendsReducer,
+  friendRequestsReceived: friendRequestsReceivedReducer,
+  friendRequestsSent: friendRequestsSentReducer
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

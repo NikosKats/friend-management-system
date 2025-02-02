@@ -118,7 +118,7 @@ router.post("/respond", async (req, res) => {
  * @route GET /friend-requests/pending/:userId
  * @desc Get pending friend requests for a user
  */
-router.get("/pending/:userId", async (req, res) => {
+router.get("/received/pending/:userId", async (req, res) => {
   const { userId } = req.params;
 
   if (!Types.ObjectId.isValid(userId)) {
@@ -127,6 +127,25 @@ router.get("/pending/:userId", async (req, res) => {
 
   try {
     const requests = await FriendRequest.find({ receiverId: userId, status: "pending" }).populate("senderId", "username email");
+    return res.status(200).json(requests);
+  } catch (error) {
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+/**
+ * @route GET /friend-requests/sent/pending/:userId
+ * @desc Get pending friend requests sent by a user
+ */
+router.get("/sent/pending/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  if (!Types.ObjectId.isValid(userId)) {
+    return res.status(400).json({ error: "Invalid user ID" });
+  }
+
+  try {
+    const requests = await FriendRequest.find({ senderId: userId, status: "pending" }).populate("receiverId", "username email");
     return res.status(200).json(requests);
   } catch (error) {
     return res.status(500).json({ error: "Internal server error" });

@@ -114,13 +114,30 @@ router.post("/respond", (req, res) => __awaiter(void 0, void 0, void 0, function
  * @route GET /friend-requests/pending/:userId
  * @desc Get pending friend requests for a user
  */
-router.get("/pending/:userId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/received/pending/:userId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { userId } = req.params;
     if (!mongoose_1.Types.ObjectId.isValid(userId)) {
         return res.status(400).json({ error: "Invalid user ID" });
     }
     try {
         const requests = yield FriendRequest_1.default.find({ receiverId: userId, status: "pending" }).populate("senderId", "username email");
+        return res.status(200).json(requests);
+    }
+    catch (error) {
+        return res.status(500).json({ error: "Internal server error" });
+    }
+}));
+/**
+ * @route GET /friend-requests/sent/pending/:userId
+ * @desc Get pending friend requests sent by a user
+ */
+router.get("/sent/pending/:userId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userId } = req.params;
+    if (!mongoose_1.Types.ObjectId.isValid(userId)) {
+        return res.status(400).json({ error: "Invalid user ID" });
+    }
+    try {
+        const requests = yield FriendRequest_1.default.find({ senderId: userId, status: "pending" }).populate("receiverId", "username email");
         return res.status(200).json(requests);
     }
     catch (error) {

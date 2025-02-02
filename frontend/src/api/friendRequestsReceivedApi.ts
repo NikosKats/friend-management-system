@@ -1,14 +1,17 @@
 const API_URL = 'http://localhost:8080/'; // Adjust API URL if needed
 
-// API function to fetch user's friends
-export const myFriendsApi = async () => { 
- 
+// API function to fetch received friend requests
+export const friendRequestsReceivedApi = async () => { 
   const user = localStorage.getItem("user");
- 
+
+  if (!user) {
+    console.error("🛑 [API] No user data found! Authentication required.");
+    throw new Error("User not logged in.");
+  }
+
   const parsedUser = JSON.parse(user); // Parse the JSON string into an object
   const userId = parsedUser._id; // Extract the _id
   console.log("User ID:", userId);
- 
 
   const token = localStorage.getItem("token");
 
@@ -18,11 +21,11 @@ export const myFriendsApi = async () => {
   }
 
   try {
-    const response = await fetch(`${API_URL}friends/list/${userId}`, {
+    const response = await fetch(`${API_URL}friendRequests/received/pending/${userId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-         "x-auth-token": token ? `${token}` : ""
+        "x-auth-token": token ? `${token}` : ""
       },
     });
 
@@ -33,12 +36,12 @@ export const myFriendsApi = async () => {
 
     if (!response.ok) {
       console.error("❌ [API] Fetch failed:", data.message);
-      throw new Error(data.message || "Failed to fetch friends list");
+      throw new Error(data.message || "Failed to fetch received friend requests");
     }
 
     return data;
   } catch (error) {
-    console.error("🔥 [API] Error fetching friends list:", error);
+    console.error("🔥 [API] Error fetching received friend requests:", error);
     throw error;
   }
 };

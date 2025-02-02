@@ -19,12 +19,6 @@ const Home: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4 pt-20">
-      <h1 className="text-4xl font-semibold text-center text-blue-600 mb-6">
-        Friend Management System
-      </h1>
-      
-      <Counter />
-
       {/* UserGrid component to display all users */}
       <UserGrid />
     </div>
