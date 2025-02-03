@@ -62,33 +62,3 @@ export const respondToFriendRequestApi = async (requestId: string, status: strin
   }
 };
 
-// API Request for Removing a Friend
-export const removeFriendApi = async (userId: string, friendId: string) => {
-  console.log(`📡 API: Removing Friend with ID: ${friendId} for User with ID: ${userId}`);
-  
-  try {
-    const response = await fetch(`${API_URL}friends/remove`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json', // Ensure JSON content type
-      },
-      body: JSON.stringify({
-        userId, // User ID
-        friendId, // Friend ID
-      }),
-    });
-
-    if (!response.ok) {
-      console.error("⚠️ API: Error in removing Friend. Response not OK.", response);
-      throw new Error('Error removing Friend');
-    }
-
-    const data = await response.json();
-    console.log("📥 API: Received response for removing Friend:", data);
-    
-    return data;
-  } catch (error) {
-    console.error("🔥 API: Error in removing Friend:", error);
-    throw error;
-  }
-};

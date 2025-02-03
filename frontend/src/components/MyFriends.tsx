@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchMyFriendsRequest } from "../actions/myFriendsActions";
+import { fetchMyFriendsRequest, REMOVE_MY_FRIENDS_REQUEST } from "../actions/myFriendsActions";
 import { RootState } from "../store";
 
 const MyFriends: React.FC = () => {
@@ -15,6 +15,15 @@ const MyFriends: React.FC = () => {
     console.log("📬 Dispatching FETCH_MY_FRIENDS_REQUEST action...");
     dispatch(fetchMyFriendsRequest());
   }, [dispatch]);
+
+  // Remove Friend Handler
+  const handleRemoveFriend = (userId: string, friendId: string) => {
+    console.log("📡 Dispatching REMOVE_MY_FRIENDS_REQUEST action...");
+    dispatch({
+      type: REMOVE_MY_FRIENDS_REQUEST,
+      payload: { userId, friendId },
+    });
+  };
 
   return (
     <div className="p-6">
@@ -35,7 +44,10 @@ const MyFriends: React.FC = () => {
               </div>
               <h3 className="text-lg font-semibold">{friend.username}</h3>
               <p className="text-gray-500">{friend.email}</p>
-              <button className="mt-2 bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition">
+              <button
+                onClick={() => handleRemoveFriend("userId-placeholder", friend.id)}
+                className="mt-2 bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition"
+              >
                 Remove
               </button>
             </div>
